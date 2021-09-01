@@ -58,28 +58,29 @@ plt.plot(interp["age"], interp["cli"], 'bo-')
 plt.plot(interp["age"], interp["div"], 'go-')
 plt.savefig("cli_div_interp")
 
-#Predators vs. herbivores
 
 div = pd.read_csv("Pred_3Myr.csv", sep=",", header = 0, usecols = ["mid_ma", "pred_div", "herb_div"])
 div = div.rename(columns={"mid_ma":"age"})
-div["herb_div"] = div["pred_div"]/np.max(div["herb_div"])
+print(div)
+div["herb_div"] = div["herb_div"]/np.max(div["herb_div"])
 div["pred_div"] = div["pred_div"]/np.max(div["pred_div"])
-div["age"] = np.round(div["age"], 2)
-interp_bins = np.linspace(66,0,200)
-
+cli["age"] = np.round(cli["age"], 1)
 
 merged = cli.merge(div, on='age')#TODO: merge with climate timeseries after interpolation
 
+interp_bins = np.linspace(0,66,200)
+
 #NOTE: flipping to preserve time direction, differentiating between age and time flow
 interp_cli = np.flip(np.interp(interp_bins, merged["age"], merged["smoothed"]))
-interp_pred = np.flip(np.interp(interp_bins, merged["age"], merged["pred_div"]))
-interp_herb = np.flip(np.interp(interp_bins, merged["age"], merged["herb_div"]))
-interp = {'age':list(interp_bins), "cli":list(interp_cli), "pred_div":list(interp_pred), "herb_div":list(interp_herb)}
+interp_pred= np.flip(np.interp(interp_bins, merged["age"], merged["pred_div"]))
+interp_herb= np.flip(np.interp(interp_bins, merged["age"], merged["herb_div"]))
+
+interp = {'age':list(interp_bins), "smoothed":list(interp_cli), "pred_div":list(interp_pred), "herb_div":list(interp_herb)}
+#interp = {'age':list(interp_bins), "cli":list(interp_cli), "div":list(interp_div)}
+
+#interp["age"] = -1*interp["age"]
+#interp["age"] = interp["age"] -66#+ np.min(merged["age"])
+
 interp = pd.DataFrame(interp) 
 
-interp.to_csv("Pred_interp.csv", index=False)
-
-plt.plot(interp["age"], interp["cli"], 'bo-')
-plt.plot(interp["age"], interp["herb_div"], 'go-')
-plt.plot(interp["age"], interp["pred_div"], 'ro-')
-plt.savefig("cli_pred_interp")
+interp.to_csv("pred_interp.csv", index=False)
