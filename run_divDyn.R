@@ -88,18 +88,9 @@ subsampling_q = 0.6
 subsampling_taxon = "genus"
 subsampling_bin = "stg"
 
-sqs0.6 <-subsample(occ, coll="col", iter=1, q=subsampling_q, tax=subsampling_taxon, bin=subsampling_bin, type=subsampling_type, duplicates=FALSE)
-
-max_age <- max(occ$NOW_max_ma)
-min_age <- min(occ$NOW_min_ma)
-age_bins <- seq(max_age, min_age, by = -3)
-
+sqs0.6 <-subsample(occ, coll="col", iter=100, q=subsampling_q, tax=subsampling_taxon, bin=subsampling_bin, type=subsampling_type, duplicates=FALSE)
 #richness with smaller bins
-mid_ma_indices <- cut(occ$NOW_mid_ma, breaks = age_bins, labels = FALSE)#round(apply(occ[,c("NOW_max_ma","NOW_min_ma")], 1, mean), 0) #1-Myr bins
-#mid_ma_indices
-
-occ$mid_ma <- mid_ma_indices*3
-
+occ$mid_ma<- round(apply(occ[,c("NOW_max_ma","NOW_min_ma")], 1, mean), 0) #1-Myr bins
 ddIDbin <- divDyn(occ, tax="genus", bin="mid_ma", revtime=TRUE, om="coll", coll="col")
 
 tsplot(stages, shading="series", boxes="sys", xlim=82:93,
